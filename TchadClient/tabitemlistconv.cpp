@@ -1,4 +1,5 @@
 #include "tabitemlistconv.h"
+#include <QDebug>
 
 TabItemListConv::TabItemListConv(QWidget *parent) : QWidget(parent)
 {
@@ -7,19 +8,20 @@ TabItemListConv::TabItemListConv(QWidget *parent) : QWidget(parent)
     layout->insertWidget(0, list);
 }
 
-void TabItemListConv::addSendMsg(QString text){
+void TabItemListConv::addSendMsg(QString msg){
     QDateTime date = QDateTime::currentDateTime();
     QString fullText = date.toString("dd/MM/yy hh:mm");
-    fullText += ": -> " + text;
-    QListWidgetItem *newItem = new QListWidgetItem(text);
+    fullText += " : -> " + msg;
+    qDebug() << fullText;
+    QListWidgetItem *newItem = new QListWidgetItem(fullText);
     newItem->setForeground(Qt::blue);
     list->addItem(newItem);
 }
 
-void TabItemListConv::addReceiveMsg(QDateTime date, QString text){
+void TabItemListConv::addReceiveMsg(QDateTime date, QString msg){
     QString fullText = date.toString("dd/MM/yy hh:mm");
-    fullText += ": <- " + text;
-    QListWidgetItem *newItem = new QListWidgetItem(text);
+    fullText += " : <- " + msg;
+    QListWidgetItem *newItem = new QListWidgetItem(fullText);
     newItem->setForeground(Qt::red);
     list->addItem(newItem);
 }

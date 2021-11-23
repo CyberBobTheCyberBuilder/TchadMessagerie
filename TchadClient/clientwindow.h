@@ -18,6 +18,7 @@ public:
 public slots:
     void newConversation();
     void closeMyTab(int);
+    void sendMessage();
 
 private:
     Ui::ClientWindow *ui;

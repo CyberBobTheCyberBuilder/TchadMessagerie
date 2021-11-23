@@ -19,10 +19,11 @@ ClientWindow::ClientWindow(QWidget *parent)
 void ClientWindow::newConversation(){
     qDebug() << "BnewConv pressed";
     bool ok;
-    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),tr("User name :"), QLineEdit::Normal, "", &ok);
+    QString text = QInputDialog::getText(this, tr("Nouvelle conversation"),tr("User name :"), QLineEdit::Normal, "", &ok);
     if (ok && !text.isEmpty()){
         ui->tabConv->addTab(new TabItemListConv(), text);
         ui->Bsend->setDisabled(false);
+        ui->Bsend->setAutoDefault(true);
         ui->BexportPDF->setDisabled(false);
         ui->LEinputMsg->setDisabled(false);
     }
@@ -34,11 +35,24 @@ void ClientWindow::closeMyTab(int i){
     ui->tabConv->removeTab(i);
     if(ui->tabConv->count() <= 0){
         ui->Bsend->setDisabled(true);
+        ui->Bsend->setAutoDefault(false);
         ui->tabConv->setDisabled(true);
         ui->tabConv->setDisabled(true);
     }
 }
 
+void ClientWindow::sendMessage(){
+    qDebug() << "Bsend pressed";
+    QString message = ui->LEinputMsg->text().simplified();
+    if(message.isEmpty()){
+        return;
+    }
+    TabItemListConv *currentTab = qobject_cast<TabItemListConv*>(ui->tabConv->currentWidget());
+    if(currentTab != nullptr){
+        currentTab->addSendMsg(message);
+        ui->LEinputMsg->setText("");
+    }
+}
 
 ClientWindow::~ClientWindow()
 {
