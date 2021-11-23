@@ -12,7 +12,7 @@ ClientWindow::ClientWindow(QWidget *parent)
 
     //Connect ui
     connect(ui->BnewConv, SIGNAL(pressed()), this, SLOT(newConversation()));
-
+    connect(ui->tabConv, SIGNAL(tabCloseRequested(int)), this, SLOT(closeMyTab(int)));
 }
 
 void ClientWindow::newConversation(){
