@@ -14,12 +14,13 @@ ClientWindow::ClientWindow(QWidget *parent)
     connect(ui->BnewConv, SIGNAL(pressed()), this, SLOT(newConversation()));
     connect(ui->Bsend, SIGNAL(pressed()), this, SLOT(sendMessage()));
     connect(ui->tabConv, SIGNAL(tabCloseRequested(int)), this, SLOT(closeMyTab(int)));
+    connect(ui->MAlogout, SIGNAL(triggered()), this, SLOT(menuLogoutPressed()));
 }
 
 void ClientWindow::newConversation(){
     qDebug() << "BnewConv pressed";
     bool ok;
-    QString text = QInputDialog::getText(this, tr("Nouvelle conversation"),tr("User name :"), QLineEdit::Normal, "", &ok);
+    QString text = QInputDialog::getText(this, tr("Nouvelle conversation"),tr("User name :"), QLineEdit::Normal, "", &ok).simplified();
     if (ok && !text.isEmpty()){
         ui->tabConv->addTab(new TabItemListConv(), text);
         ui->Bsend->setDisabled(false);
@@ -54,8 +55,14 @@ void ClientWindow::sendMessage(){
     }
 }
 
+void ClientWindow::menuLogoutPressed(){
+    qDebug() << "logout";
+    emit logout();
+}
+
 ClientWindow::~ClientWindow()
 {
     delete ui;
+    qDebug() << "client window destroyed";
 }
 

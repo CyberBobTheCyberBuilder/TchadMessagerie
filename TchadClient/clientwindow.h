@@ -19,6 +19,10 @@ public slots:
     void newConversation();
     void closeMyTab(int);
     void sendMessage();
+    void menuLogoutPressed();
+
+signals:
+    void logout();
 
 private:
     Ui::ClientWindow *ui;
