@@ -10,10 +10,12 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    clientwindow.cpp
+    clientwindow.cpp \
+    tabitemlistconv.cpp
 
 HEADERS += \
-    clientwindow.h
+    clientwindow.h \
+    tabitemlistconv.h
 
 FORMS += \
     clientwindow.ui

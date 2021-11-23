@@ -15,6 +15,9 @@ public:
     ClientWindow(QWidget *parent = nullptr);
     ~ClientWindow();
 
+public slots:
+    void newConversation();
+
 private:
     Ui::ClientWindow *ui;
 };
