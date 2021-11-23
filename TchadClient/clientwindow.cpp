@@ -12,6 +12,7 @@ ClientWindow::ClientWindow(QWidget *parent)
 
     //Connect ui
     connect(ui->BnewConv, SIGNAL(pressed()), this, SLOT(newConversation()));
+    connect(ui->Bsend, SIGNAL(pressed()), this, SLOT(sendMessage()));
     connect(ui->tabConv, SIGNAL(tabCloseRequested(int)), this, SLOT(closeMyTab(int)));
 }
 
@@ -26,6 +27,18 @@ void ClientWindow::newConversation(){
         ui->LEinputMsg->setDisabled(false);
     }
 }
+
+void ClientWindow::closeMyTab(int i){
+    qDebug() << "Tab closed";
+    delete ui->tabConv->widget(i);
+    ui->tabConv->removeTab(i);
+    if(ui->tabConv->count() <= 0){
+        ui->Bsend->setDisabled(true);
+        ui->tabConv->setDisabled(true);
+        ui->tabConv->setDisabled(true);
+    }
+}
+
 
 ClientWindow::~ClientWindow()
 {
