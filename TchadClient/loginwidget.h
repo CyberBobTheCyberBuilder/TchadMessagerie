@@ -4,6 +4,9 @@
 #include <QWidget>
 #include <QCryptographicHash>
 #include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QTcpSocket>
 #include "clientwindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -21,8 +24,12 @@ public:
 public slots:
     void BloginPressed();
     void ClientLogout();
+    void receiveResponse();
+
 private:
     Ui::LoginWidget *ui;
+    QTcpSocket *socket;
+
 };
 
 #endif // LOGINWIDGET_H

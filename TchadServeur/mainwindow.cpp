@@ -54,11 +54,6 @@ void MainWindow::serverConnected(){
     clientsNotLogin.append(connection);
 
     QString peerAddress = connection->peerAddress().toString();
-    QString address = peerAddress == "::1" ? "localhost" : peerAddress.replace("::ffff:", "");
-
-    QByteArray buffer;
-    buffer = QByteArray::fromStdString("connected");
-    connection->write(buffer);
 
     this->writeLogs(CONNEXION, "Nouvelle connexion (" + address + ") !", Qt::blue);
 }
@@ -66,7 +61,7 @@ void MainWindow::serverConnected(){
 bool MainWindow::clientLogin(QString name, QString password)
 {
     this->writeLogs(LOGIN, "Tentative de login pour l'utilisateur `" + name + "`.", Qt::green);
-
+    
     GestionFile gf("logins.json");
     QJsonArray logins = gf.getJsonArray();
 
@@ -87,35 +82,39 @@ void MainWindow::socketDisconnected(){
 
     QTcpSocket* disconnectingClient = (QTcpSocket*) sender();
 
-    QString username = "Anonymous";
     QString peerAddress = disconnectingClient->peerAddress().toString();
     QString address = peerAddress == "::1" ? "localhost" : peerAddress.replace("::ffff:", "");
 
-    if (clientsTcp.contains(disconnectingClient))
+    this->clientLogout(disconnectingClient);
+
+    this->writeLogs(CONNEXION, "Fin de connexion (" + address + ") s'est déconnecté.", Qt::blue);
+
+    disconnectingClient->deleteLater();
+}
+
+void MainWindow::clientLogout(QTcpSocket * incomingSocket){
+
+    QString username = "Anonymous";
+    if (clientsTcp.contains(incomingSocket))
     {
-        username = clientsTcp[disconnectingClient];
+        username = clientsTcp[incomingSocket];
+        clientsTcp.remove(incomingSocket);
+        clientsNotLogin.append(incomingSocket);
     }
-
-    this->writeLogs(CONNEXION, "Le client " + username + " (" + address + ") s'est déconnecté.", Qt::blue);
-
     QList<QListWidgetItem *> items = ui->listConnected->findItems(username, Qt::MatchExactly);
 
     for (QListWidgetItem *item: qAsConst(items)) {
         ui->listConnected->removeItemWidget(item);
         delete item;
     }
-
-    clientsTcp.remove(disconnectingClient);
-    clientsNotLogin.removeAll(disconnectingClient);
-
-    disconnectingClient->deleteLater();
+    this->writeLogs(LOGIN, "Le client " + username + " s'est déconnecté.", Qt::green);
 }
 
 void MainWindow::readyToRead(){
 
     QTcpSocket* incomingSocket = (QTcpSocket*) sender();
     QByteArray data = incomingSocket->readAll();
-
+    qDebug() << data;
     QJsonDocument doc = QJsonDocument::fromJson(data);
 
     QJsonObject obj;
@@ -159,6 +158,9 @@ void MainWindow::readyToRead(){
             QJsonDocument doc(response);
 
             incomingSocket->write(doc.toJson());
+        }
+        else if(action == "logout"){
+            this->clientLogout(incomingSocket);
         }
         else if(action == "send"){
             /*

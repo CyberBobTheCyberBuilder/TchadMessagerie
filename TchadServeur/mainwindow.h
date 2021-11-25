@@ -35,6 +35,7 @@ public:
     QList<QTcpSocket*> clientsNotLogin;
 private:
     void writeLogs(QString, QString, Qt::GlobalColor);
+    void clientLogout(QTcpSocket *);
 
 public slots:
     void serverConnected();
