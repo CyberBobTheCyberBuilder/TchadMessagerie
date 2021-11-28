@@ -36,6 +36,7 @@ public:
 private:
     void writeLogs(QString, QString, Qt::GlobalColor);
     void clientLogout(QTcpSocket *);
+    bool isLoginExist(QString);
 
 public slots:
     void serverConnected();

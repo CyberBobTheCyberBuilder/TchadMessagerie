@@ -5,6 +5,7 @@
 #define SERVEUR "[SERVEUR]"
 #define CONNEXION "[CONNEXION]"
 #define LOGIN "[LOGIN]"
+#define UTILS "[UTILS]"
 #define ERROR "[ERROR]"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -54,6 +55,8 @@ void MainWindow::serverConnected(){
     clientsNotLogin.append(connection);
 
     QString peerAddress = connection->peerAddress().toString();
+    QString address = peerAddress == "::1" ? "localhost" : peerAddress.replace("::ffff:", "");
+
 
     this->writeLogs(CONNEXION, "Nouvelle connexion (" + address + ") !", Qt::blue);
 }
@@ -110,6 +113,21 @@ void MainWindow::clientLogout(QTcpSocket * incomingSocket){
     this->writeLogs(LOGIN, "Le client " + username + " s'est déconnecté.", Qt::green);
 }
 
+bool MainWindow::isLoginExist(QString login){
+
+    GestionFile gf("logins.json");
+    QJsonArray logins = gf.getJsonArray();
+    for (const QJsonValue &obj: qAsConst(logins)) {
+        QJsonObject currentObject = obj.toObject();
+
+        if (currentObject.value("login").toString() == login) {
+
+            return true;
+        }
+    }
+    return false;
+}
+
 void MainWindow::readyToRead(){
 
     QTcpSocket* incomingSocket = (QTcpSocket*) sender();
@@ -161,6 +179,21 @@ void MainWindow::readyToRead(){
         }
         else if(action == "logout"){
             this->clientLogout(incomingSocket);
+        }
+        else if(action == "isloginexist"){
+            QString login = obj.value("login").toString();
+            QJsonObject response;
+            response.insert("action", "answerisloginexist");
+            if(this->isLoginExist(login)){
+                response.insert("state", "ok");
+            }
+            else{
+                response.insert("state", "fail");
+            }
+            QJsonDocument doc(response);
+            incomingSocket->write(doc.toJson());
+
+            this->writeLogs(UTILS, "Vérification de l'existence de l'utilisateur : " + login, Qt::darkGray);
         }
         else if(action == "send"){
             /*
