@@ -2,6 +2,12 @@
 #define CLIENTWINDOW_H
 
 #include <QMainWindow>
+#include <QCryptographicHash>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QTcpSocket>
+#include "dataressource.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ClientWindow; }
@@ -12,14 +18,17 @@ class ClientWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    ClientWindow(QWidget *parent = nullptr);
+    ClientWindow(QWidget *parent = nullptr, DataRessource *dr = nullptr);
     ~ClientWindow();
+    DataRessource *dr;
 
 public slots:
-    void newConversation();
+    void BnewConv();
+    void createConv(bool state);
     void closeMyTab(int);
     void sendMessage();
     void menuLogoutPressed();
+    void receiveMsg();
 
 signals:
     void logout();

@@ -8,6 +8,7 @@
 #include <QJsonArray>
 #include <QTcpSocket>
 #include "clientwindow.h"
+#include "dataressource.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LoginWidget; }
@@ -19,12 +20,13 @@ class LoginWidget : public QWidget
 public:
     LoginWidget(QWidget *parent = nullptr);
     ~LoginWidget();
-    ClientWindow *c;
+    ClientWindow *client;
+    DataRessource *dr;
 
 public slots:
     void BloginPressed();
     void ClientLogout();
-    void receiveResponse();
+    void login(bool);
 
 private:
     Ui::LoginWidget *ui;

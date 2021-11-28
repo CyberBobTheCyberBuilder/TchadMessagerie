@@ -4,8 +4,10 @@
 TabItemListConv::TabItemListConv(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    list = new QListWidget();
-    layout->insertWidget(0, list);
+    //list = new QListWidget();
+    PTEmsgs = new QPlainTextEdit();
+    PTEmsgs->setReadOnly(true);
+    layout->insertWidget(0, PTEmsgs);
 }
 
 void TabItemListConv::addSendMsg(QString msg){
@@ -13,17 +15,21 @@ void TabItemListConv::addSendMsg(QString msg){
     QString fullText = date.toString("dd/MM/yy hh:mm");
     fullText += " : -> " + msg;
     qDebug() << fullText;
-    QListWidgetItem *newItem = new QListWidgetItem(fullText);
-    newItem->setForeground(Qt::blue);
-    list->addItem(newItem);
+    QTextCharFormat tf = PTEmsgs->currentCharFormat();
+    tf.setForeground(QBrush(Qt::blue));
+    PTEmsgs->setCurrentCharFormat(tf);
+
+    PTEmsgs->appendPlainText(fullText);
 }
 
 void TabItemListConv::addReceiveMsg(QDateTime date, QString msg){
     QString fullText = date.toString("dd/MM/yy hh:mm");
     fullText += " : <- " + msg;
-    QListWidgetItem *newItem = new QListWidgetItem(fullText);
-    newItem->setForeground(Qt::red);
-    list->addItem(newItem);
+    QTextCharFormat tf = PTEmsgs->currentCharFormat();
+    tf.setForeground(QBrush(Qt::red));
+    PTEmsgs->setCurrentCharFormat(tf);
+
+    PTEmsgs->appendPlainText(fullText);
 }
 
 TabItemListConv::~TabItemListConv()

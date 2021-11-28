@@ -5,6 +5,7 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 #include <QDateTime>
+#include <QPlainTextEdit>
 
 class TabItemListConv : public QWidget
 {
@@ -17,6 +18,7 @@ public:
 
 public:
     QListWidget *list;
+    QPlainTextEdit *PTEmsgs;
 signals:
 
 };
