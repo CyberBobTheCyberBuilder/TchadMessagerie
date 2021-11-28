@@ -43,7 +43,6 @@ void LoginWidget::ClientLogout()
 {
     disconnect(client, SIGNAL(logout()), this, SLOT(ClientLogout()));
 
-    dr->sendData(json);
     ui->LEpwd->setText("");
     client->close();
     this->show();
@@ -51,6 +50,7 @@ void LoginWidget::ClientLogout()
     {
         {"action", "logout"}
     };
+    dr->sendData(json);
     connect(ui->Blogin, SIGNAL(pressed()), this, SLOT(BloginPressed()));
 
 }
