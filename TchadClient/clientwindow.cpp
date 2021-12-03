@@ -3,6 +3,9 @@
 #include <QDebug>
 #include <QInputDialog>
 #include <QErrorMessage>
+#include <QPdfWriter>
+#include <QPainter>
+#include <QPrinter>
 #include "tabitemlistconv.h"
 
 QString text;
@@ -17,10 +20,33 @@ ClientWindow::ClientWindow(QWidget *parent, DataRessource *dr)
     connect(ui->Bsend, SIGNAL(pressed()), this, SLOT(sendMessage()));
     connect(ui->tabConv, SIGNAL(tabCloseRequested(int)), this, SLOT(closeMyTab(int)));
     connect(ui->MAlogout, SIGNAL(triggered()), this, SLOT(menuLogoutPressed()));
+    connect(ui->BexportPDF, SIGNAL(pressed()), this, SLOT(BexportPDFPressed()));
 
+    connect(dr, SIGNAL(messageReceived(QString, QString, QDateTime)), this, SLOT(receivedMessage(QString, QString, QDateTime)));
+    QJsonObject json
+    {
+        {"action", "get_waiting_messages"}
+    };
+    dr->sendData(json);
 }
 
-void ClientWindow::receiveMsg(){
+void ClientWindow::receivedMessage(QString from, QString content, QDateTime sendAt){
+    int index = -1;
+    for(int i = 0; i < ui->tabConv->count(); i++){
+        if(ui->tabConv->tabText(i) == from){
+            index = i;
+        }
+    }
+    if(index == -1){
+        index = ui->tabConv->addTab(new TabItemListConv(), from);
+        ui->Bsend->setDisabled(false);
+        ui->Bsend->setAutoDefault(true);
+        ui->BexportPDF->setDisabled(false);
+        ui->LEinputMsg->setDisabled(false);
+    }
+
+    TabItemListConv *currentTab = qobject_cast<TabItemListConv*>(ui->tabConv->widget(index));
+    currentTab->addReceiveMsg(sendAt, content);
 
 }
 
@@ -76,6 +102,15 @@ void ClientWindow::sendMessage(){
     }
     TabItemListConv *currentTab = qobject_cast<TabItemListConv*>(ui->tabConv->currentWidget());
     if(currentTab != nullptr){
+        int currentIndex = ui->tabConv->currentIndex();
+        QList<QString> to = {ui->tabConv->tabText(currentIndex)};
+        QJsonObject json
+        {
+            {"action", "send"},
+            {"to", QJsonArray::fromStringList(to)},
+            {"content", message}
+        };
+        dr->sendData(json);
         currentTab->addSendMsg(message);
         ui->LEinputMsg->setText("");
     }
@@ -84,6 +119,27 @@ void ClientWindow::sendMessage(){
 void ClientWindow::menuLogoutPressed(){
     qDebug() << "logout";
     emit logout();
+}
+
+void ClientWindow::BexportPDFPressed()
+{
+    qDebug() << "Export";
+    QPrinter printer;
+    //TODO : QDialogFolder choice folder
+    printer.setOutputFileName("/home/fabrice/Bureau/export.pdf");
+    printer.setOutputFormat(QPrinter::PdfFormat);
+
+    TabItemListConv *currentTab = qobject_cast<TabItemListConv*>(ui->tabConv->currentWidget());
+    QString content = currentTab->PTEmsgs->toPlainText();
+
+    QPainter painter;
+    if (! painter.begin(&printer)) {
+         qDebug("failed to open file, is it writable?");
+         return;
+     }
+    QRect r = painter.viewport();
+    painter.drawText(r, Qt::AlignLeft, content);
+    painter.end();
 }
 
 ClientWindow::~ClientWindow()

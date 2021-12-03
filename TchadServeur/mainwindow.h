@@ -33,10 +33,12 @@ public:
     QTcpServer *tcpServer;
     QMap<QTcpSocket*, QString> clientsTcp;
     QList<QTcpSocket*> clientsNotLogin;
+
 private:
     void writeLogs(QString, QString, Qt::GlobalColor);
     void clientLogout(QTcpSocket *);
     bool isLoginExist(QString);
+    void sendWaitingMsg(QString);
 
 public slots:
     void serverConnected();

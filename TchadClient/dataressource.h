@@ -25,7 +25,7 @@ public slots:
 signals:
     void connected();
     void disconnected();
-    void messageReceived(QString, QDateTime);
+    void messageReceived(QString, QString, QDateTime);
     void responseLogin(bool);
     void responseIsLoginExist(bool);
 

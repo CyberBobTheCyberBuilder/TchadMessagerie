@@ -26,7 +26,7 @@ void GestionFile::write(QJsonArray jsonarray){
         file.open(QIODevice::NewOnly | QIODevice::ReadWrite | QIODevice::Text);
     }
     else{
-        file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+        file.open(QIODevice::WriteOnly | QIODevice::Text);
     }
     QJsonDocument doc(jsonarray);
     QByteArray json = doc.toJson();

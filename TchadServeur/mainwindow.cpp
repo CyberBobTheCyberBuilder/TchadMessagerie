@@ -1,11 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "gestionfile.h"
+#include <QThread>
 
 #define SERVEUR "[SERVEUR]"
 #define CONNEXION "[CONNEXION]"
 #define LOGIN "[LOGIN]"
 #define UTILS "[UTILS]"
+#define MESSAGE "[MESSAGE]"
 #define ERROR "[ERROR]"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -56,7 +58,6 @@ void MainWindow::serverConnected(){
 
     QString peerAddress = connection->peerAddress().toString();
     QString address = peerAddress == "::1" ? "localhost" : peerAddress.replace("::ffff:", "");
-
 
     this->writeLogs(CONNEXION, "Nouvelle connexion (" + address + ") !", Qt::blue);
 }
@@ -196,44 +197,82 @@ void MainWindow::readyToRead(){
             this->writeLogs(UTILS, "Vérification de l'existence de l'utilisateur : " + login, Qt::darkGray);
         }
         else if(action == "send"){
-            /*
-            Envoi message du client
-            Trame :
-            {
-                "action":"send",
-                "to":["login1","login2"....],
-                "content":"message"
+            QJsonArray to = obj.value("to").toArray();
+            QString content = obj.value("content").toString();
+            QString sendAt = QDateTime::currentDateTime().toString("dd/MM/yy hh:mm:ss");
+            QString from = clientsTcp[incomingSocket];
+
+            this->writeLogs(MESSAGE, "L'utilisateur " + from + " a envoyé un message.", Qt::black);
+
+            for(const QJsonValue& user : qAsConst(to)){
+                QJsonObject newMsg
+                {
+                    {"to", user.toString()},
+                    {"from", from},
+                    {"content", content},
+                    {"datetime", sendAt}
+                };
+
+                if(clientsTcp.key(user.toString()) == nullptr){
+                    GestionFile gf("messages.json");
+                    QJsonArray messages = gf.getJsonArray();
+                    messages.append(newMsg);
+                    gf.write(messages);
+                }
+                else{
+                    QTcpSocket *socket = clientsTcp.key(user.toString());
+                    newMsg.insert("action", "receive");
+                    QJsonDocument doc(newMsg);
+                    socket->write(doc.toJson());
+                }
             }
-            Si un message est envoyé à un client non connecté, il est stocké dans un fichier du serveur.
-            Un message peut être envoyé à plusieurs destinataires.
-            */
-            //SAVE THE CURRENT DATETIME
         }
-        else if(action == "receive"){
-            /*
-            Réception message
-            Trame :
-            {
-                "action":"receive",
-                "from":"login1",
-                "content":"message",
-                "datetime":"12/11/2021 14 :56" }
-            */
+        else if(action == "get_waiting_messages"){
+            this->sendWaitingMsg(clientsTcp[incomingSocket]);
         }
     }
 
     qDebug() << "ACTION : " << action;
 }
 
+void MainWindow::sendWaitingMsg(QString login){
+    QTcpSocket *socket = clientsTcp.key(login);
+    GestionFile gf("messages.json");
+    QJsonArray messages = gf.getJsonArray();
+    QList<int> indexToRemove = {};
+
+    for (int i = 0; i < messages.count(); i++) {
+        QJsonObject currentObject = messages.at(i).toObject();
+
+        if (currentObject.value("to").toString() == login) {
+            QJsonObject json
+            {
+              {"action", "receive"},
+              {"from", currentObject.value("from").toString()},
+              {"content", currentObject.value("content").toString()},
+              {"datetime", currentObject.value("datetime").toString()},
+            };
+            QJsonDocument doc(json);
+            qDebug() << json;
+            socket->write(doc.toJson());
+            indexToRemove.append(i);
+        }
+    }
+    //TODO : remove correctly
+    // PK TU TE RETIRES PAS
+    // FAIRE CODE PLUS BEAU
+    for(int i : indexToRemove){
+        messages.removeAt(i);
+    }
+    gf.write(messages);
+}
+
 void MainWindow::addClient(){
     QDialog dialog(this);
-    // Use a layout allowing to have a label next to each field
     QFormLayout form(&dialog);
 
-    // Add some text above the fields
     form.addRow(new QLabel("Connectez-vous"));
 
-    // Add the lineEdits with their respective labels
     QList<QLineEdit *> fields;
     QLineEdit *idEdit = new QLineEdit(&dialog);
     QString idLabel = "Identifiant";
@@ -284,7 +323,6 @@ void MainWindow::deleteClient(){
                 QJsonObject currentObject = logins.at(i).toObject();
 
                 if (currentObject.value("login").toString() == item->text()) {
-                    qDebug() << i;
                     logins.removeAt(i);
                 }
             }

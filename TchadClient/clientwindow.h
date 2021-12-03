@@ -28,7 +28,8 @@ public slots:
     void closeMyTab(int);
     void sendMessage();
     void menuLogoutPressed();
-    void receiveMsg();
+    void BexportPDFPressed();
+    void receivedMessage(QString, QString, QDateTime);
 
 signals:
     void logout();
