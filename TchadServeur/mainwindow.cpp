@@ -239,11 +239,10 @@ void MainWindow::sendWaitingMsg(QString login){
     QTcpSocket *socket = clientsTcp.key(login);
     GestionFile gf("messages.json");
     QJsonArray messages = gf.getJsonArray();
-    QList<int> indexToRemove = {};
-
-    for (int i = 0; i < messages.count(); i++) {
+    int i = 0;
+    while(i < messages.count()) {
         QJsonObject currentObject = messages.at(i).toObject();
-
+        qDebug() << "TO : " << currentObject.value("to").toString();
         if (currentObject.value("to").toString() == login) {
             QJsonObject json
             {
@@ -255,14 +254,11 @@ void MainWindow::sendWaitingMsg(QString login){
             QJsonDocument doc(json);
             qDebug() << json;
             socket->write(doc.toJson());
-            indexToRemove.append(i);
+            messages.removeAt(i);
         }
-    }
-    //TODO : remove correctly
-    // PK TU TE RETIRES PAS
-    // FAIRE CODE PLUS BEAU
-    for(int i : indexToRemove){
-        messages.removeAt(i);
+        else{
+            i++;
+        }
     }
     gf.write(messages);
 }
