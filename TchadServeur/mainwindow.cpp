@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->tcpServer = new QTcpServer(this);
 
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(serverConnected()));
-    tcpServer->listen(QHostAddress::Any, 44444);
+    tcpServer->listen(QHostAddress::Any, 8585);
 
     connect(ui->BaddClient, SIGNAL(pressed()), this, SLOT(addClient()));
     connect(ui->BdeleteClient, SIGNAL(pressed()), this, SLOT(deleteClient()));
@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::writeLogs(QString type, QString msg, Qt::GlobalColor color)
 {
     QString log = type + " ";
-    log += QDateTime::currentDateTime().toString("dd/MM/yy hh:mm:ss");
+    log += QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
     log += " -> " + msg;
     QTextCharFormat tf = ui->PTElogs->currentCharFormat();
     tf.setForeground(QBrush(color));
@@ -170,13 +170,16 @@ void MainWindow::readyToRead(){
                 response.insert("state", "ok");
                 this->writeLogs(LOGIN, "L'utilisateur `" + login + "` est connecté.", Qt::green);
                 ui->listConnected->addItem(login);
+                QJsonDocument doc(response);
+                incomingSocket->write(doc.toJson());
+                incomingSocket->waitForBytesWritten();
+                this->sendWaitingMsg(login);
 
             } else {
                 response.insert("state", "fail");
+                QJsonDocument doc(response);
+                incomingSocket->write(doc.toJson());
             }
-            QJsonDocument doc(response);
-
-            incomingSocket->write(doc.toJson());
         }
         else if(action == "logout"){
             this->clientLogout(incomingSocket);
@@ -199,7 +202,7 @@ void MainWindow::readyToRead(){
         else if(action == "send"){
             QJsonArray to = obj.value("to").toArray();
             QString content = obj.value("content").toString();
-            QString sendAt = QDateTime::currentDateTime().toString("dd/MM/yy hh:mm:ss");
+            QString sendAt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
             QString from = clientsTcp[incomingSocket];
 
             this->writeLogs(MESSAGE, "L'utilisateur " + from + " a envoyé un message.", Qt::black);
@@ -254,6 +257,7 @@ void MainWindow::sendWaitingMsg(QString login){
             QJsonDocument doc(json);
             qDebug() << json;
             socket->write(doc.toJson());
+            socket->waitForBytesWritten();
             messages.removeAt(i);
         }
         else{
@@ -297,7 +301,7 @@ void MainWindow::addClient(){
 
         QJsonObject newLogin;
         newLogin.insert("login", idEdit->text());
-        newLogin.insert("password", QString(p.toHex()));
+        newLogin.insert("password", QString(p.toBase64()));
         logins.append(newLogin);
 
         gf.write(logins);
