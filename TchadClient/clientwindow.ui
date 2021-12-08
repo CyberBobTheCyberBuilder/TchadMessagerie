@@ -6,16 +6,100 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>684</width>
+    <height>347</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ClientWindow</string>
+   <string>Tchat</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
-  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="BnewConv">
+      <property name="text">
+       <string>Nouvelle conversation</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tabConv">
+      <property name="tabPosition">
+       <enum>QTabWidget::West</enum>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLineEdit" name="LEinputMsg">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="Bsend">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Envoyer</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="BexportPDF">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Export PDF</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>684</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuOptions">
+    <property name="tearOffEnabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionEnable_dark_mode"/>
+    <addaction name="MAlogout"/>
+   </widget>
+   <addaction name="menuOptions"/>
+  </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="MAlogout">
+   <property name="text">
+    <string>Se déconnecter</string>
+   </property>
+  </action>
+  <action name="actionEnable_dark_mode">
+   <property name="text">
+    <string>Enable dark mode</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

@@ -1,4 +1,4 @@
-QT       += core gui network printsupport
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,21 +9,16 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    dataressource.cpp \
-    loginwidget.cpp \
+    gestionfile.cpp \
     main.cpp \
-    clientwindow.cpp \
-    tabitemlistconv.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    clientwindow.h \
-    dataressource.h \
-    loginwidget.h \
-    tabitemlistconv.h
+    gestionfile.h \
+    mainwindow.h
 
 FORMS += \
-    clientwindow.ui \
-    loginwidget.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
