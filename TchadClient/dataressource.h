@@ -21,6 +21,7 @@ public:
 public slots:
     void sendMsg(QString, QList<QString>);
     void receiveData();
+    void serverDisconnected();
 
 signals:
     void connected();

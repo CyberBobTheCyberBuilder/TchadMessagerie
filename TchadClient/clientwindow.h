@@ -7,6 +7,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QTcpSocket>
+#include <QPalette>
 #include "dataressource.h"
 
 QT_BEGIN_NAMESPACE
@@ -21,6 +22,9 @@ public:
     ClientWindow(QWidget *parent = nullptr, DataRessource *dr = nullptr);
     ~ClientWindow();
     DataRessource *dr;
+    QPalette whitePalette;
+    QPalette darkModePalette;
+    bool enabledDarkMode;
 
 public slots:
     void BnewConv();
@@ -28,6 +32,7 @@ public slots:
     void closeMyTab(int);
     void sendMessage();
     void menuLogoutPressed();
+    void changeDarkMode();
     void BexportPDFPressed();
     void receivedMessage(QString, QString, QDateTime);
 

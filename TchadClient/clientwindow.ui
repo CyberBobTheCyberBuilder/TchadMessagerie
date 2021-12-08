@@ -84,6 +84,7 @@
     <property name="title">
      <string>Options</string>
     </property>
+    <addaction name="actionEnable_dark_mode"/>
     <addaction name="MAlogout"/>
    </widget>
    <addaction name="menuOptions"/>
@@ -92,6 +93,11 @@
   <action name="MAlogout">
    <property name="text">
     <string>Se déconnecter</string>
+   </property>
+  </action>
+  <action name="actionEnable_dark_mode">
+   <property name="text">
+    <string>Enable dark mode</string>
    </property>
   </action>
  </widget>

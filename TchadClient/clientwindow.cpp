@@ -6,6 +6,7 @@
 #include <QPdfWriter>
 #include <QPainter>
 #include <QPrinter>
+#include <QPalette>
 #include "tabitemlistconv.h"
 
 QString text;
@@ -15,11 +16,30 @@ ClientWindow::ClientWindow(QWidget *parent, DataRessource *dr)
 {
     ui->setupUi(this);
     this->dr = dr;
+
+    this->enabledDarkMode = false;
+    this->whitePalette = this->palette();
+    this->darkModePalette = QPalette();
+    darkModePalette.setColor(QPalette::Window, QColor(53, 53, 53));
+    darkModePalette.setColor(QPalette::WindowText, Qt::white);
+    darkModePalette.setColor(QPalette::Base, QColor(25, 25, 25));
+    darkModePalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+    darkModePalette.setColor(QPalette::ToolTipBase, Qt::black);
+    darkModePalette.setColor(QPalette::ToolTipText, Qt::white);
+    darkModePalette.setColor(QPalette::Text, Qt::white);
+    darkModePalette.setColor(QPalette::Button, QColor(53, 53, 53));
+    darkModePalette.setColor(QPalette::ButtonText, Qt::white);
+    darkModePalette.setColor(QPalette::BrightText, Qt::red);
+    darkModePalette.setColor(QPalette::Link, QColor(42, 130, 218));
+    darkModePalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+    darkModePalette.setColor(QPalette::HighlightedText, Qt::black);
+
     //Connect ui
     connect(ui->BnewConv, SIGNAL(pressed()), this, SLOT(BnewConv()));
     connect(ui->Bsend, SIGNAL(pressed()), this, SLOT(sendMessage()));
     connect(ui->tabConv, SIGNAL(tabCloseRequested(int)), this, SLOT(closeMyTab(int)));
     connect(ui->MAlogout, SIGNAL(triggered()), this, SLOT(menuLogoutPressed()));
+    connect(ui->actionEnable_dark_mode, SIGNAL(triggered()), this, SLOT(changeDarkMode()));
     connect(ui->BexportPDF, SIGNAL(pressed()), this, SLOT(BexportPDFPressed()));
 
     connect(dr, SIGNAL(messageReceived(QString, QString, QDateTime)), this, SLOT(receivedMessage(QString, QString, QDateTime)));
@@ -132,6 +152,18 @@ void ClientWindow::sendMessage(){
 void ClientWindow::menuLogoutPressed(){
     qDebug() << "logout";
     emit logout();
+}
+
+void ClientWindow::changeDarkMode(){
+    this->enabledDarkMode = !this->enabledDarkMode;
+    if(this->enabledDarkMode){
+        ui->actionEnable_dark_mode->setText("Disable dark mode");
+        this->setPalette(darkModePalette);
+    }
+    else{
+        ui->actionEnable_dark_mode->setText("Enable dark mode");
+        this->setPalette(this->whitePalette);
+    }
 }
 
 void ClientWindow::BexportPDFPressed()

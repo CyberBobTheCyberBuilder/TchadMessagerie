@@ -13,6 +13,7 @@ DataRessource::DataRessource(QObject *parent) : QObject(parent)
 
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(receiveData()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(serverDisconnected()));
 }
 
 void DataRessource::receiveData(){
@@ -73,6 +74,12 @@ void DataRessource::receiveData(){
         qDebug() << "ACTION : " << action;
     }
 
+}
+
+void DataRessource::serverDisconnected()
+{
+    disconnect(socket, SIGNAL(disconnected()), this, SLOT(serverDisconnected()));
+    emit disconnected();
 }
 
 void DataRessource::sendMsg(QString content, QList<QString> to){
