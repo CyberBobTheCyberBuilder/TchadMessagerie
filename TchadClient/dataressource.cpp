@@ -3,7 +3,7 @@
 DataRessource::DataRessource(QObject *parent) : QObject(parent)
 {
     socket = new QTcpSocket(this);
-    socket->connectToHost("localhost", 44444);
+    socket->connectToHost("localhost", 8585);
     if(socket->waitForConnected(5000)){
         qDebug() << "connected";
     }
@@ -56,7 +56,7 @@ void DataRessource::receiveData(){
             else if (action == "receive") {
                 QString from = obj.value("from").toString();
                 QString msg = obj.value("content").toString();
-                QDateTime sendAt = QDateTime::fromString(obj.value("datetime").toString(), "dd/MM/yy hh:mm:ss");
+                QDateTime sendAt = QDateTime::fromString(obj.value("datetime").toString(), "dd/MM/yyyy hh:mm:ss");
                 qDebug() << msg;
                 emit messageReceived(from, msg, sendAt);
             }

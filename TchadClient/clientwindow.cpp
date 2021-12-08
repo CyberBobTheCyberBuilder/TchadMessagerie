@@ -23,11 +23,16 @@ ClientWindow::ClientWindow(QWidget *parent, DataRessource *dr)
     connect(ui->BexportPDF, SIGNAL(pressed()), this, SLOT(BexportPDFPressed()));
 
     connect(dr, SIGNAL(messageReceived(QString, QString, QDateTime)), this, SLOT(receivedMessage(QString, QString, QDateTime)));
+
+    // Sécurité : demander au serveur les messages en attente qu'après le chargement de la fenêtre
+    // IMCOMPATIBLE AVEC LES AUTRES SERVEURS
+    /*
     QJsonObject json
     {
         {"action", "get_waiting_messages"}
     };
     dr->sendData(json);
+    */
 }
 
 void ClientWindow::receivedMessage(QString from, QString content, QDateTime sendAt){
@@ -56,13 +61,21 @@ void ClientWindow::BnewConv(){
     text = QInputDialog::getText(this, tr("Nouvelle conversation"),tr("User name :"), QLineEdit::Normal, "", &ok).simplified();
     if (ok && !text.isEmpty()){
         disconnect(ui->BnewConv, SIGNAL(pressed()), this, SLOT(BnewConv()));
+
+        this->createConv(true);
+
+        // Sécurité : vérification de l'existence de l'utilisateur
+        // IMCOMPATIBLE AVEC LES AUTRES SERVEURS
+        /*
         QJsonObject json
         {
             {"action", "isloginexist"},
             {"login", text}
         };
         connect(dr, SIGNAL(responseIsLoginExist(bool)), this, SLOT(createConv(bool)));
+
         dr->sendData(json);
+        */
     }
 }
 
@@ -130,16 +143,8 @@ void ClientWindow::BexportPDFPressed()
     printer.setOutputFormat(QPrinter::PdfFormat);
 
     TabItemListConv *currentTab = qobject_cast<TabItemListConv*>(ui->tabConv->currentWidget());
-    QString content = currentTab->PTEmsgs->toPlainText();
 
-    QPainter painter;
-    if (! painter.begin(&printer)) {
-         qDebug("failed to open file, is it writable?");
-         return;
-     }
-    QRect r = painter.viewport();
-    painter.drawText(r, Qt::AlignLeft, content);
-    painter.end();
+    currentTab->PTEmsgs->document()->print(&printer);
 }
 
 ClientWindow::~ClientWindow()

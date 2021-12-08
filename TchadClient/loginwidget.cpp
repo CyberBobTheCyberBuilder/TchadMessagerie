@@ -21,7 +21,7 @@ void LoginWidget::BloginPressed()
         {
             {"action", "login"},
             {"login", id},
-            {"password", QString(pwd.toHex())}
+            {"password", QString(pwd.toBase64())}
         };
         connect(dr, SIGNAL(responseLogin(bool)), this, SLOT(login(bool)));
         dr->sendData(json);

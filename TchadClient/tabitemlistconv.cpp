@@ -12,7 +12,7 @@ TabItemListConv::TabItemListConv(QWidget *parent) : QWidget(parent)
 
 void TabItemListConv::addSendMsg(QString msg){
     QDateTime date = QDateTime::currentDateTime();
-    QString fullText = date.toString("dd/MM/yy hh:mm");
+    QString fullText = date.toString("dd/MM/yyyy hh:mm:ss");
     fullText += " : -> " + msg;
     qDebug() << fullText;
     QTextCharFormat tf = PTEmsgs->currentCharFormat();
@@ -23,7 +23,7 @@ void TabItemListConv::addSendMsg(QString msg){
 }
 
 void TabItemListConv::addReceiveMsg(QDateTime date, QString msg){
-    QString fullText = date.toString("dd/MM/yy hh:mm");
+    QString fullText = date.toString("dd/MM/yyyy hh:mm:ss");
     fullText += " : <- " + msg;
     QTextCharFormat tf = PTEmsgs->currentCharFormat();
     tf.setForeground(QBrush(Qt::red));
